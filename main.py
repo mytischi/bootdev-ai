@@ -4,6 +4,7 @@ from google import genai
 from google.genai import types
 import argparse
 from promts import system_prompt
+from functions.call_function import available_functions
 
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
@@ -27,7 +28,9 @@ model_name = 'gemini-2.5-flash'
 response = client.models.generate_content(
     model=model_name,
     contents=messages,
-    config=types.GenerateContentConfig(system_instruction=system_prompt),
+    config=types.GenerateContentConfig(
+        tools=[available_functions],
+        system_instruction=system_prompt),
 )
 
 if args.verbose:
@@ -38,7 +41,14 @@ if args.verbose:
 if response.usage_metadata == None:
     raise RuntimeError("Something went wrong...")
 
+function_calls = response.function_calls
+if function_calls != None:
+    for function_call in function_calls:
+        print(f"Calling function: {function_call.name}({function_call.args})")
+
+else:
+    print(response.text)
 
 
-print(response.text)
+#print(response.text)
 
