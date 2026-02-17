@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 import argparse
-
+from promts import system_prompt
 
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
@@ -22,8 +22,12 @@ args = parser.parse_args()
 
 messages = [types.Content(role="user", parts=[types.Part(text=args.user_prompt)])]
 
+model_name = 'gemini-2.5-flash'
+
 response = client.models.generate_content(
-    model='gemini-2.5-flash', contents=messages
+    model=model_name,
+    contents=messages,
+    config=types.GenerateContentConfig(system_instruction=system_prompt),
 )
 
 if args.verbose:
