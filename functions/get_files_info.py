@@ -17,6 +17,7 @@ schema_get_files_info = types.FunctionDeclaration(
 )
 
 def get_files_info(working_directory, directory="."):
+    directory = directory.strip().strip('"').strip("'")
     working_dir_abs = os.path.abspath(working_directory)
     target_dir = os.path.normpath(os.path.join(working_dir_abs, directory))
     
@@ -24,11 +25,12 @@ def get_files_info(working_directory, directory="."):
     valid_target_dir = os.path.commonpath([working_dir_abs, target_dir]) == working_dir_abs
 
     if not valid_target_dir:
-        return print(f'Error: Cannot list "{directory}" as it is outside the permitted working directory')
+        print(f'Error: Cannot list {directory} as it is outside the permitted working directory')
+        return f'Error: Cannot list {directory} as it is outside the permitted working directory'
      
     if not os.path.isdir(target_dir):
-        return print(f'Error: "{directory}" is not a directory')
-    
+        print(f'Error: {directory} is not a directory')
+        return f'Error: {directory} is not a directory'
     files_info = []
 
     for file_name in os.listdir(target_dir):
@@ -38,8 +40,8 @@ def get_files_info(working_directory, directory="."):
         file_info = f"- {file_name}: file_size={file_size}, is_dir={is_dir}"
         files_info.append(file_info)
         
-
-    return print("\n".join(files_info))
+    print("\n".join(files_info))
+    return "\n".join(files_info)
 
 
 
